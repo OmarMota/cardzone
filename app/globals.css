@@ -1,26 +1,210 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0b0d12;
+  --surface: #13151c;
+  --surface-2: #1a1d28;
+  --border: #1f2130;
+  --border-2: #252836;
+  --text: #c9d1d9;
+  --text-muted: #6b7280;
+  --text-dim: #374151;
+  --orange: #f97316;
+  --orange-dim: rgba(249, 115, 22, 0.12);
+  --orange-border: rgba(249, 115, 22, 0.4);
+  --today: #3b82f6;
+  --font-display: 'Syne', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-body: 'DM Sans', system-ui, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html,
+body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.modal-slide-up {
+  animation: slide-up 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fade-in 0.25s ease;
+}
+
+@keyframes badge-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.12); }
+}
+
+.badge-pulse {
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+.cal-cell {
+  transition: background 0.1s ease;
+}
+
+.cal-cell:hover {
+  background: var(--surface-2);
+}
+
+.event-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px 2px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: filter 0.1s ease, transform 0.1s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  border-left-width: 2px;
+  border-left-style: solid;
+}
+
+.event-pill:hover {
+  filter: brightness(1.2);
+  transform: translateY(-1px);
+}
+
+.event-pill.is-updated {
+  background: rgba(249, 115, 22, 0.12) !important;
+  border-left-color: #f97316 !important;
+  color: #fed7aa !important;
+}
+
+.filter-tab {
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.filter-tab:hover {
+  border-color: var(--border-2);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.filter-tab.active {
+  border-color: var(--border-2);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.update-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  border: 1.5px solid var(--border-2);
+  color: var(--text-muted);
+  background: var(--surface);
+  font-family: var(--font-display);
+}
+
+.update-btn:hover {
+  border-color: var(--orange-border);
+  color: var(--orange);
+  background: var(--orange-dim);
+}
+
+.update-btn.has-updates {
+  border-color: var(--orange-border);
+  color: var(--orange);
+  background: var(--orange-dim);
+}
+
+.update-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.toast {
+  animation: toast-in 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes row-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.row-fade {
+  animation: row-fade 0.3s ease both;
 }
