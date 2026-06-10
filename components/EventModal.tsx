@@ -9,6 +9,9 @@ interface Props {
   event: TCGEvent;
   isUpdated: boolean;
   onClose: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  isUserEvent?: boolean;
 }
 
 // ── Static maps ───────────────────────────────────────────────────────────────
@@ -169,7 +172,7 @@ const ExtIcon = () => (
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
 
-export default function EventModal({ event, isUpdated, onClose }: Props) {
+export default function EventModal({ event, isUpdated, onClose, onEdit, onDelete, isUserEvent }: Props) {
   const game = GAME_CONFIG[event.game];
   const overlayRef = useRef<HTMLDivElement>(null);
   const idea = getIdea(event);
@@ -337,6 +340,32 @@ export default function EventModal({ event, isUpdated, onClose }: Props) {
               ))}
             </div>
           </div>
+
+          {/* Edit / Delete — user events only */}
+          {isUserEvent && (
+            <div className="px-5 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid #1c1f2b' }}>
+              <button
+                onClick={onEdit}
+                className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-[13px] font-semibold transition-colors"
+                style={{ background: '#1a1d28', color: '#c9d1d9', border: '1px solid #252836' }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#252836')}
+                onMouseLeave={e => (e.currentTarget.style.background = '#1a1d28')}
+              >
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2-7 7H2.5v-2l7-7z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/></svg>
+                Modifica
+              </button>
+              <button
+                onClick={() => { if (confirm('Eliminare questo evento?')) { onDelete?.(); onClose(); } }}
+                className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-[13px] font-semibold transition-colors"
+                style={{ background: 'rgba(239,68,68,0.08)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.15)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.08)')}
+              >
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 3.5h10M5.5 3.5V2h3v1.5M5 3.5v8h4v-8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Elimina
+              </button>
+            </div>
+          )}
 
           {/* Source link */}
           {event.sourceUrl && (

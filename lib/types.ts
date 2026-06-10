@@ -28,6 +28,16 @@ export interface TCGEvent {
   sourceUrl?: string;
 }
 
+export interface RecurringRule {
+  frequency: 'weekly' | 'biweekly' | 'monthly';
+  until: string; // 'yyyy-MM-dd'
+}
+
+export interface UserEvent extends TCGEvent {
+  isUserCreated: true;
+  recurring?: RecurringRule;
+}
+
 export interface UpdateBatch {
   date: string;
   eventIds: string[];
