@@ -148,7 +148,7 @@ export default function EventForm({ open, onClose, onSave, initial, defaultDate 
         style={{ background: '#13151c', border: '1px solid #252836', borderRadius: 16 }}
       >
         <DialogHeader>
-          <DialogTitle className="text-[15px] font-bold" style={{ color: '#eef0f6', fontFamily: 'var(--font-display)' }}>
+          <DialogTitle className="text-[15px] font-bold" style={{ color: '#eef0f6' }}>
             {isEdit ? 'Modifica evento' : 'Nuovo evento'}
           </DialogTitle>
         </DialogHeader>

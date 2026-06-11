@@ -4,8 +4,12 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   format, startOfMonth, endOfMonth, eachDayOfInterval,
   getDay, addMonths, subMonths, isToday, isSameMonth,
-  addDays, subDays, parseISO,
+  addDays, subDays,
 } from 'date-fns';
+import {
+  BellIcon, PlusIcon, ChevronLeftIcon, ChevronRightIcon,
+  ReloadIcon, CheckIcon,
+} from '@radix-ui/react-icons';
 import { ALL_EVENTS, GAME_NIGHTS } from '@/lib/data';
 import { getUnseenEventIds, shouldNotifyToday, markNotifiedToday, UPDATE_BATCHES } from '@/lib/updates';
 import { GAME_CONFIG, GAME_ORDER } from '@/lib/gameConfig';
@@ -26,40 +30,6 @@ const PRIORITY_OPTIONS: { value: Priority; label: string; color: string }[] = [
   { value: 'opportunity', label: 'Opportunity', color: '#eab308' },
   { value: 'optional',    label: 'Optional',    color: '#6b7280' },
 ];
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-function SpinIcon() {
-  return (
-    <svg className="spin" width="13" height="13" viewBox="0 0 14 14" fill="none">
-      <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5" strokeDasharray="8 20" strokeLinecap="round" />
-    </svg>
-  );
-}
-function CheckIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-      <path d="M2.5 7l3.5 3.5 5.5-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-function RefreshIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-      <path d="M12 7A5 5 0 112.08 5M2 2v3h3" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-function BellIcon({ active }: { active: boolean }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 17 17" fill="none">
-      <path d="M8.5 1.5a5.5 5.5 0 00-5.5 5.5v3L1.5 12.5h14l-1.5-2.5V7A5.5 5.5 0 008.5 1.5z"
-        stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"
-        fill={active ? 'currentColor' : 'none'} fillOpacity={active ? 0.15 : 0} />
-      <path d="M6.5 12.5a2 2 0 004 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 // ── Mini calendar ─────────────────────────────────────────────────────────────
 
@@ -82,24 +52,32 @@ function MiniCal({ current, onNavigate, eventDates }: {
   });
 
   return (
-    <div className="px-3 py-3">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-bold" style={{ color: '#9ca3af', fontFamily: 'var(--font-display)' }}>
+    <div className="px-4 py-4">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-[11px] font-bold tracking-widest uppercase" style={{ color: '#4b5563' }}>
           {format(mini, 'MMM yyyy')}
         </span>
-        <div className="flex items-center gap-1">
-          <button onClick={() => setMini(d => subMonths(d, 1))} className="w-5 h-5 rounded flex items-center justify-center hover:bg-accent" style={{ color: '#6b7280' }}>
-            <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M6.5 1.5L3 5l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={() => setMini(d => subMonths(d, 1))}
+            className="w-5 h-5 rounded flex items-center justify-center hover:bg-accent transition-colors"
+            style={{ color: '#6b7280' }}
+          >
+            <ChevronLeftIcon width={10} height={10} />
           </button>
-          <button onClick={() => setMini(d => addMonths(d, 1))} className="w-5 h-5 rounded flex items-center justify-center hover:bg-accent" style={{ color: '#6b7280' }}>
-            <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M3.5 1.5L7 5l-3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <button
+            onClick={() => setMini(d => addMonths(d, 1))}
+            className="w-5 h-5 rounded flex items-center justify-center hover:bg-accent transition-colors"
+            style={{ color: '#6b7280' }}
+          >
+            <ChevronRightIcon width={10} height={10} />
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-7 gap-0.5 mb-1">
         {WEEKDAYS_MINI.map((d, i) => (
-          <div key={i} className="text-center text-[10px] font-bold" style={{ color: '#374151' }}>{d}</div>
+          <div key={i} className="text-center text-[9px] font-bold" style={{ color: '#374151' }}>{d}</div>
         ))}
       </div>
 
@@ -119,8 +97,7 @@ function MiniCal({ current, onNavigate, eventDates }: {
               style={{
                 width: 22, height: 22,
                 fontSize: 10,
-                fontFamily: 'var(--font-mono)',
-                color: !inMonth ? '#2d3040' : today ? '#fff' : '#9ca3af',
+                color: !inMonth ? '#1e2235' : today ? '#fff' : '#6b7280',
                 background: today ? '#3b82f6' : isSelected && inMonth ? 'rgba(255,255,255,0.05)' : 'transparent',
                 fontWeight: today ? 700 : 400,
               }}
@@ -164,61 +141,57 @@ function DayCell({ day, dayStr, events, isCurrentMonth, isToday, isWeekend, unse
       style={{
         borderRight: '1px solid var(--border)',
         borderBottom: '1px solid var(--border)',
-        background: isToday ? 'rgba(59,130,246,0.04)' : isWeekend ? 'rgba(255,255,255,0.01)' : 'transparent',
-        opacity: isCurrentMonth ? 1 : 0.28,
+        background: isToday ? 'rgba(59,130,246,0.04)' : isWeekend ? 'rgba(255,255,255,0.012)' : 'transparent',
+        opacity: isCurrentMonth ? 1 : 0.22,
         animationDelay: `${rowIndex * 35}ms`,
         overflow: 'hidden',
-        padding: '8px 6px 6px',
+        padding: '10px 10px 8px',
       }}
     >
-      {/* Date number */}
-      <div className="flex items-center justify-between mb-1.5 flex-shrink-0">
+      {/* Date number row */}
+      <div className="flex items-center justify-between mb-2 flex-shrink-0">
         <span
           className="flex items-center justify-center rounded-full font-semibold leading-none"
           style={{
-            width: 24, height: 24,
-            fontFamily: 'var(--font-mono)',
-            fontSize: 11,
+            width: 26, height: 26,
+            fontSize: 12,
             background: isToday ? '#3b82f6' : 'transparent',
-            color: isToday ? '#fff' : '#4b5563',
+            color: isToday ? '#fff' : isCurrentMonth ? '#4b5563' : '#2a2f42',
             fontWeight: isToday ? 700 : 500,
           }}
         >
           {format(day, 'd')}
         </span>
 
-        {/* Count badge */}
+        {/* Event count badge */}
         {events.length >= 2 && (
           <span
             className="flex items-center justify-center rounded-full font-bold"
             style={{
-              width: 17, height: 17, fontSize: 9,
-              fontFamily: 'var(--font-mono)',
-              background: events.some(e => unseenSet.has(e.id)) ? '#f97316' : '#1f2130',
-              color: events.some(e => unseenSet.has(e.id)) ? '#fff' : '#6b7280',
+              width: 18, height: 18, fontSize: 9,
+              background: events.some(e => unseenSet.has(e.id)) ? '#f97316' : '#1a1d28',
+              color: events.some(e => unseenSet.has(e.id)) ? '#fff' : '#4b5563',
             }}
           >
             {events.length}
           </span>
         )}
 
-        {/* Add button — visible on hover */}
+        {/* Add button — on hover, when not crowded */}
         {events.length < 2 && (
           <button
             onClick={() => onAddClick(dayStr)}
-            className="opacity-0 group-hover:opacity-100 w-5 h-5 rounded flex items-center justify-center transition-opacity"
-            style={{ color: '#6b7280', background: '#1a1d28' }}
+            className="opacity-0 group-hover:opacity-100 w-5 h-5 rounded flex items-center justify-center transition-opacity hover:bg-accent"
+            style={{ color: '#6b7280' }}
             title="Aggiungi evento"
           >
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <path d="M5 1v8M1 5h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            <PlusIcon width={11} height={11} />
           </button>
         )}
       </div>
 
-      {/* Pills */}
-      <div className="flex flex-col gap-0.5 overflow-hidden flex-1 min-h-0">
+      {/* Event pills */}
+      <div className="flex flex-col gap-1 overflow-hidden flex-1 min-h-0">
         {visible.map(event => {
           const game = GAME_CONFIG[event.game];
           const isUpdated = unseenSet.has(event.id);
@@ -248,7 +221,7 @@ function DayCell({ day, dayStr, events, isCurrentMonth, isToday, isWeekend, unse
         })}
 
         {overflow > 0 && (
-          <span className="text-[10px] pl-1" style={{ color: '#4b5563' }}>+{overflow} altri</span>
+          <span className="text-[10px] pl-1.5 mt-0.5" style={{ color: '#374151' }}>+{overflow} altri</span>
         )}
       </div>
     </div>
@@ -272,7 +245,7 @@ export default function CalendarPage() {
   // User events CRUD
   const { userEvents, addEvent, updateEvent, removeEvent } = useUserEvents();
 
-  // Sidebar filter state — use checkbox sets
+  // Sidebar filter state
   const [visibleGames, setVisibleGames] = useState<Set<GameSlug>>(new Set(GAME_ORDER));
   const [visiblePriorities, setVisiblePriorities] = useState<Set<Priority>>(
     new Set<Priority>(['must_do', 'important', 'opportunity', 'optional'])
@@ -333,24 +306,20 @@ export default function CalendarPage() {
     if (perm === 'granted') showToast('Notifiche attivate — aggiornamenti alle 8:00 GMT');
   }, [showToast]);
 
-  // Expand user recurring events
   const expandedUserEvents = useMemo(() =>
     userEvents.flatMap(ev => expandEvent(ev)),
   [userEvents]);
 
-  // Build full event list
   const allEvents = useMemo(() =>
     [...ALL_EVENTS, ...GAME_NIGHTS, ...expandedUserEvents],
   [expandedUserEvents]);
 
-  // User event ID set (base IDs) for UI indicators
   const userEventIds = useMemo(() => new Set(userEvents.map(e => e.id)), [userEvents]);
 
-  // Filtered events
   const filteredEvents = useMemo(() =>
     allEvents.filter(e => {
       if (!visibleGames.has(e.game)) return false;
-      if (e.type === 'game_night') return true; // game nights skip priority filter
+      if (e.type === 'game_night') return true;
       return visiblePriorities.has(e.priority);
     }),
   [allEvents, visibleGames, visiblePriorities]);
@@ -372,10 +341,8 @@ export default function CalendarPage() {
     filteredEvents.filter(e => e.date === ds),
   [filteredEvents]);
 
-  // Event dates for mini calendar dots
   const eventDates = useMemo(() => new Set(filteredEvents.map(e => e.date)), [filteredEvents]);
 
-  // Toggle helpers
   const toggleGame = (g: GameSlug) => setVisibleGames(prev => {
     const n = new Set(prev);
     n.has(g) ? n.delete(g) : n.add(g);
@@ -387,7 +354,6 @@ export default function CalendarPage() {
     return n;
   });
 
-  // Find the UserEvent behind a potentially-expanded TCGEvent
   const findUserEvent = (ev: TCGEvent): UserEvent | undefined =>
     userEvents.find(u => u.id === baseId(ev.id));
 
@@ -417,20 +383,27 @@ export default function CalendarPage() {
 
       {/* ── TOP BAR ── */}
       <header
-        className="flex-shrink-0 flex items-center justify-between px-5 h-14 gap-4"
+        className="flex-shrink-0 flex items-center justify-between px-6 h-[56px] gap-4"
         style={{ borderBottom: '1px solid var(--border)', background: 'var(--card)' }}
       >
         {/* Logo */}
-        <div className="flex items-center gap-2.5 flex-shrink-0">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'var(--orange-dim)', border: '1px solid var(--orange-border)' }}>
-            <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <div
+            className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: 'var(--orange-dim)', border: '1px solid var(--orange-border)' }}
+          >
+            <svg width="15" height="15" viewBox="0 0 18 18" fill="none">
               <rect x="2.25" y="3.75" width="13.5" height="12" rx="2" stroke="#f97316" strokeWidth="1.5" />
               <path d="M6 2.25v2.25M12 2.25v2.25M2.25 7.5h13.5" stroke="#f97316" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </div>
           <div>
-            <p className="text-sm font-black tracking-widest uppercase leading-none" style={{ color: '#e5e7eb', fontFamily: 'var(--font-display)', letterSpacing: '0.12em' }}>Cardzone</p>
-            <p className="text-[10px] leading-none mt-0.5" style={{ color: '#4b5563', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em' }}>TCG Calendar</p>
+            <p className="text-[13px] font-black tracking-[0.16em] uppercase leading-none font-heading" style={{ color: '#e5e7eb' }}>
+              Cardzone
+            </p>
+            <p className="text-[10px] leading-none mt-0.5 tracking-widest" style={{ color: '#374151' }}>
+              TCG Calendar
+            </p>
           </div>
         </div>
 
@@ -438,62 +411,76 @@ export default function CalendarPage() {
         <div className="flex items-center gap-2 flex-1 justify-center">
           <button
             onClick={() => setCurrentDate(d => subMonths(d, 1))}
-            className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors hover:bg-accent"
+            className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:bg-accent"
             style={{ color: '#6b7280' }}
           >
-            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <ChevronLeftIcon width={14} height={14} />
           </button>
           <button
             onClick={() => setCurrentDate(new Date(2026, 5, 9))}
-            className="text-sm font-bold min-w-[148px] text-center hover:text-foreground transition-colors"
-            style={{ fontFamily: 'var(--font-display)', color: '#e5e7eb', letterSpacing: '0.02em' }}
+            className="text-[14px] font-semibold min-w-[160px] text-center hover:text-foreground transition-colors capitalize"
+            style={{ color: '#d4dae4', letterSpacing: '0.01em' }}
             title="Torna ad oggi"
           >
             {format(currentDate, 'MMMM yyyy')}
           </button>
           <button
             onClick={() => setCurrentDate(d => addMonths(d, 1))}
-            className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors hover:bg-accent"
+            className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:bg-accent"
             style={{ color: '#6b7280' }}
           >
-            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M5 2l5 5-5 5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <ChevronRightIcon width={14} height={14} />
           </button>
         </div>
 
         {/* Right actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Bell */}
           <button
             onClick={handleRequestNotif}
             title={notifPerm === 'granted' ? 'Notifiche attive' : 'Attiva notifiche'}
-            className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:bg-accent"
-            style={{ color: notifPerm === 'granted' ? '#f97316' : '#6b7280', background: notifPerm === 'granted' ? 'var(--orange-dim)' : 'transparent' }}
+            className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors hover:bg-accent"
+            style={{
+              color: notifPerm === 'granted' ? '#f97316' : '#6b7280',
+              background: notifPerm === 'granted' ? 'var(--orange-dim)' : 'transparent',
+              border: notifPerm === 'granted' ? '1px solid var(--orange-border)' : '1px solid transparent',
+            }}
           >
-            <BellIcon active={notifPerm === 'granted'} />
+            <BellIcon width={16} height={16} />
           </button>
 
+          {/* Update */}
           <button
             className={`update-btn ${unseenCount > 0 ? 'has-updates' : ''}`}
             onClick={handleUpdate}
             disabled={isUpdating}
           >
-            {isUpdating ? <><SpinIcon /><span>Aggiornamento</span></> :
-             justUpdated ? <><CheckIcon /><span>Aggiornato</span></> :
-             <><RefreshIcon /><span>Update</span>
-               {unseenCount > 0 && (
-                 <span className="badge-pulse inline-flex items-center justify-center rounded-full text-white font-bold"
-                   style={{ fontSize: 9, minWidth: 17, height: 17, padding: '0 3px', background: '#f97316', fontFamily: 'var(--font-mono)' }}>
-                   {unseenCount}
-                 </span>
-               )}
-             </>}
+            {isUpdating
+              ? <><ReloadIcon width={13} height={13} className="spin" /><span>Aggiornamento</span></>
+              : justUpdated
+              ? <><CheckIcon width={13} height={13} /><span>Aggiornato</span></>
+              : <>
+                  <ReloadIcon width={13} height={13} />
+                  <span>Update</span>
+                  {unseenCount > 0 && (
+                    <span
+                      className="badge-pulse inline-flex items-center justify-center rounded-full text-white font-bold"
+                      style={{ fontSize: 9, minWidth: 17, height: 17, padding: '0 4px', background: '#f97316' }}
+                    >
+                      {unseenCount}
+                    </span>
+                  )}
+                </>
+            }
           </button>
 
+          {/* Add */}
           <Button
             onClick={() => handleOpenForm()}
-            className="h-8 px-4 text-xs font-bold gap-1.5"
+            className="h-9 px-4 text-[12px] font-bold gap-1.5"
             style={{ background: '#f97316', color: '#fff', letterSpacing: '0.04em' }}
           >
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+            <PlusIcon width={13} height={13} />
             Aggiungi
           </Button>
         </div>
@@ -505,28 +492,31 @@ export default function CalendarPage() {
         {/* ── SIDEBAR ── */}
         <aside
           className="flex-shrink-0 flex flex-col overflow-y-auto"
-          style={{ width: 210, background: 'var(--sidebar)', borderRight: '1px solid var(--sidebar-border)' }}
+          style={{ width: 220, background: 'var(--sidebar)', borderRight: '1px solid var(--sidebar-border)' }}
         >
           {/* Game filters */}
-          <div className="px-4 pt-4 pb-2">
-            <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: '#374151' }}>Giochi</p>
-            <div className="flex flex-col gap-2">
+          <div className="px-5 pt-6 pb-4">
+            <p className="text-[10px] font-bold tracking-widest uppercase mb-4 font-heading" style={{ color: '#374151' }}>
+              Giochi
+            </p>
+            <div className="flex flex-col gap-3">
               {GAME_ORDER.map(g => {
                 const cfg = GAME_CONFIG[g];
                 const checked = visibleGames.has(g);
                 return (
-                  <label key={g} className="flex items-center gap-2.5 cursor-pointer group">
+                  <label key={g} className="flex items-center gap-3 cursor-pointer">
                     <Checkbox
                       checked={checked}
                       onCheckedChange={() => toggleGame(g)}
-                      className="rounded"
+                      className="rounded flex-shrink-0"
                       style={{
-                        borderColor: checked ? cfg.dotColor : '#374151',
+                        borderColor: checked ? cfg.dotColor : '#2a2f42',
                         background: checked ? cfg.bgColor : 'transparent',
+                        width: 16, height: 16,
                       }}
                     />
                     <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: cfg.dotColor }} />
-                    <span className="text-xs font-medium" style={{ color: checked ? cfg.color : '#6b7280' }}>
+                    <span className="text-[13px] font-medium leading-none" style={{ color: checked ? cfg.color : '#4b5563' }}>
                       {cfg.shortName}
                     </span>
                   </label>
@@ -535,24 +525,32 @@ export default function CalendarPage() {
             </div>
           </div>
 
-          <Separator className="my-3" style={{ background: '#1a1d28' }} />
+          <Separator style={{ background: 'var(--sidebar-border)' }} />
 
           {/* Priority filters */}
-          <div className="px-4 pb-2">
-            <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: '#374151' }}>Priorità</p>
-            <div className="flex flex-col gap-2">
+          <div className="px-5 pt-5 pb-4">
+            <p className="text-[10px] font-bold tracking-widest uppercase mb-4 font-heading" style={{ color: '#374151' }}>
+              Priorità
+            </p>
+            <div className="flex flex-col gap-3">
               {PRIORITY_OPTIONS.map(p => {
                 const checked = visiblePriorities.has(p.value);
                 return (
-                  <label key={p.value} className="flex items-center gap-2.5 cursor-pointer">
+                  <label key={p.value} className="flex items-center gap-3 cursor-pointer">
                     <Checkbox
                       checked={checked}
                       onCheckedChange={() => togglePriority(p.value)}
-                      className="rounded"
-                      style={{ borderColor: checked ? p.color : '#374151', background: checked ? `${p.color}20` : 'transparent' }}
+                      className="rounded flex-shrink-0"
+                      style={{
+                        borderColor: checked ? p.color : '#2a2f42',
+                        background: checked ? `${p.color}20` : 'transparent',
+                        width: 16, height: 16,
+                      }}
                     />
-                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: p.color }} />
-                    <span className="text-xs font-medium" style={{ color: checked ? p.color : '#6b7280' }}>{p.label}</span>
+                    <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: p.color }} />
+                    <span className="text-[13px] font-medium leading-none" style={{ color: checked ? p.color : '#4b5563' }}>
+                      {p.label}
+                    </span>
                   </label>
                 );
               })}
@@ -562,12 +560,16 @@ export default function CalendarPage() {
           {/* Legend — user events */}
           {userEvents.length > 0 && (
             <>
-              <Separator className="my-3" style={{ background: '#1a1d28' }} />
-              <div className="px-4 pb-2">
-                <p className="text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: '#374151' }}>Miei eventi</p>
-                <div className="flex items-center gap-2">
+              <Separator style={{ background: 'var(--sidebar-border)' }} />
+              <div className="px-5 pt-5 pb-4">
+                <p className="text-[10px] font-bold tracking-widest uppercase mb-3 font-heading" style={{ color: '#374151' }}>
+                  Miei eventi
+                </p>
+                <div className="flex items-center gap-2.5">
                   <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: '#22c55e' }} />
-                  <span className="text-xs" style={{ color: '#86efac' }}>{userEvents.length} evento{userEvents.length !== 1 ? 'i' : ''}</span>
+                  <span className="text-[13px] font-medium" style={{ color: '#86efac' }}>
+                    {userEvents.length} event{userEvents.length !== 1 ? 'i' : 'o'}
+                  </span>
                 </div>
               </div>
             </>
@@ -576,21 +578,23 @@ export default function CalendarPage() {
           {/* Unseen badge */}
           {unseenCount > 0 && (
             <>
-              <Separator className="my-3" style={{ background: '#1a1d28' }} />
-              <div className="px-4">
-                <div className="flex items-center gap-2 text-xs px-2 py-1.5 rounded-md" style={{ background: 'var(--orange-dim)', border: '1px solid var(--orange-border)', color: '#f97316' }}>
-                  <span className="w-1.5 h-1.5 rounded-full badge-pulse" style={{ background: '#f97316' }} />
+              <Separator style={{ background: 'var(--sidebar-border)' }} />
+              <div className="px-5 pt-5 pb-4">
+                <div
+                  className="flex items-center gap-2.5 text-[12px] px-3 py-2.5 rounded-lg"
+                  style={{ background: 'var(--orange-dim)', border: '1px solid var(--orange-border)', color: '#f97316' }}
+                >
+                  <span className="w-2 h-2 rounded-full badge-pulse flex-shrink-0" style={{ background: '#f97316' }} />
                   <span className="font-bold">{unseenCount} nuovi</span>
                 </div>
               </div>
             </>
           )}
 
-          {/* Spacer */}
           <div className="flex-1" />
 
           {/* Mini calendar */}
-          <Separator style={{ background: '#1a1d28' }} />
+          <Separator style={{ background: 'var(--sidebar-border)' }} />
           <MiniCal
             current={currentDate}
             onNavigate={setCurrentDate}
@@ -604,11 +608,18 @@ export default function CalendarPage() {
           {/* Weekday headers */}
           <div
             className="grid flex-shrink-0"
-            style={{ gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid var(--border)', background: 'var(--card)' }}
+            style={{
+              gridTemplateColumns: 'repeat(7, 1fr)',
+              borderBottom: '1px solid var(--border)',
+              background: 'var(--card)',
+            }}
           >
             {WEEKDAYS.map(d => (
-              <div key={d} className="text-center py-2 text-[11px] font-bold tracking-widest uppercase"
-                style={{ color: '#374151', fontFamily: 'var(--font-display)', letterSpacing: '0.08em' }}>
+              <div
+                key={d}
+                className="text-center py-2.5 text-[11px] font-bold tracking-widest uppercase font-heading"
+                style={{ color: '#374151' }}
+              >
                 {d}
               </div>
             ))}
@@ -671,10 +682,10 @@ export default function CalendarPage() {
       {/* ── TOAST ── */}
       {toast && (
         <div
-          className="toast fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium z-[60]"
-          style={{ background: '#1e2130', border: '1px solid #252836', color: '#c9d1d9', boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}
+          className="toast fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2.5 px-5 py-3 rounded-xl text-[13px] font-medium z-[60]"
+          style={{ background: '#191d28', border: '1px solid #252836', color: '#c9d1d9', boxShadow: '0 12px 40px rgba(0,0,0,0.7)' }}
         >
-          <CheckIcon />
+          <CheckIcon width={14} height={14} style={{ color: '#22c55e' }} />
           {toast}
         </div>
       )}

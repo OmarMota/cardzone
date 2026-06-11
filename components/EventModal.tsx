@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { format, parseISO } from 'date-fns';
+import { Cross2Icon, Pencil1Icon, TrashIcon, Link2Icon, ExternalLinkIcon } from '@radix-ui/react-icons';
 import { TCGEvent, Priority, Confidence, EventType } from '@/lib/types';
 import { GAME_CONFIG } from '@/lib/gameConfig';
 
@@ -64,11 +65,10 @@ function formatShort(s: string) {
   catch { return s; }
 }
 
-// ── Content idea (1 paragraph, Italian) ──────────────────────────────────────
+// ── Content idea ──────────────────────────────────────────────────────────────
 
 function getIdea(event: TCGEvent): string {
   const g = GAME_CONFIG[event.game].name;
-  const t = event.title.replace(/[⚠★]/g, '').trim();
 
   switch (event.type) {
     case 'release':
@@ -130,7 +130,7 @@ function getCarousel(event: TCGEvent): Slide[] {
         { n: 1, label: 'La ricorrenza', copy: `Anniversario ${g} — titolo evocativo, anno di fondazione` },
         { n: 2, label: 'Momento 1', copy: 'Primo momento iconico del franchise — immagine + didascalia breve' },
         { n: 3, label: 'Momento 2', copy: 'Secondo momento iconico — carta o prodotto storico' },
-        { n: 4, label: 'Momento 3', copy: 'Terzo momento — il tuo negozio nella storia: "siamo con voi da X anni"' },
+        { n: 4, label: 'Momento 3', copy: 'Il tuo negozio nella storia: "siamo con voi da X anni"' },
         { n: 5, label: 'Join', copy: '"Festeggia con noi — evento speciale in store [data]"' },
       ];
     case 'accessory':
@@ -155,20 +155,6 @@ function getCarousel(event: TCGEvent): Slide[] {
       ];
   }
 }
-
-// ── Icons ─────────────────────────────────────────────────────────────────────
-
-const LinkIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-    <path d="M6 4.5H4a2.5 2.5 0 000 5h2m4-5h2a2.5 2.5 0 010 5h-2M5.5 7h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-  </svg>
-);
-
-const ExtIcon = () => (
-  <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-    <path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M7 1h4m0 0v4m0-4L5.5 6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
 
@@ -201,90 +187,86 @@ export default function EventModal({ event, isUpdated, onClose, onEdit, onDelete
       onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
     >
       <div
-        className="relative w-full sm:max-w-[480px] modal-slide-up flex flex-col"
+        className="relative w-full sm:max-w-[500px] modal-slide-up flex flex-col"
         style={{
           background: '#111318',
-          border: '1px solid #222530',
+          border: '1px solid #1e2235',
           borderRadius: 20,
           boxShadow: '0 40px 100px rgba(0,0,0,0.85)',
           maxHeight: '88vh',
           overflow: 'hidden',
         }}
       >
-        {/* ── Colour bar ── */}
+        {/* Colour bar */}
         <div style={{ height: 3, background: isUpdated ? '#f97316' : accentColor, flexShrink: 0, borderRadius: '20px 20px 0 0' }} />
 
-        {/* ── Header ── */}
+        {/* Header */}
         <div
-          className="flex items-start gap-3 px-5 pt-4 pb-3 flex-shrink-0"
+          className="flex items-start gap-4 px-6 pt-5 pb-4 flex-shrink-0"
           style={{ borderBottom: '1px solid #1c1f2b' }}
         >
           {/* Icon dot */}
           <div
-            className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
+            className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center mt-0.5"
             style={{ background: isUpdated ? 'rgba(249,115,22,0.15)' : accentBg, border: `1.5px solid ${isUpdated ? '#f97316' : accentBorder}` }}
           >
-            <div className="w-2.5 h-2.5 rounded-full" style={{ background: isUpdated ? '#f97316' : accentColor }} />
+            <div className="w-3 h-3 rounded-full" style={{ background: isUpdated ? '#f97316' : accentColor }} />
           </div>
 
           {/* Title block */}
-          <div className="flex-1 min-w-0 mt-0.5">
-            <h2 className="text-[15px] font-bold leading-snug" style={{ color: '#eef0f6', fontFamily: 'var(--font-display)', letterSpacing: '-0.01em' }}>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-[16px] font-bold leading-snug" style={{ color: '#eef0f6', letterSpacing: '-0.01em' }}>
               {event.title.replace(/[⚠★]/g, '').trim()}
             </h2>
-            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-              <span className="text-[11px] font-semibold" style={{ color: accentColor }}>{game.shortName}</span>
-              <span style={{ color: '#2d3040', fontSize: 10 }}>·</span>
-              <span className="text-[11px]" style={{ color: '#4b5563' }}>{TYPE_LABEL[event.type]}</span>
+            <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+              <span className="text-[12px] font-semibold" style={{ color: accentColor }}>{game.shortName}</span>
+              <span style={{ color: '#2d3040', fontSize: 12 }}>·</span>
+              <span className="text-[12px]" style={{ color: '#4b5563' }}>{TYPE_LABEL[event.type]}</span>
             </div>
           </div>
 
           {/* Close */}
           <button
             onClick={onClose}
-            className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center"
-            style={{ color: '#4b5563', background: '#1a1d28' }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#252836'; (e.currentTarget as HTMLElement).style.color = '#9ca3af'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#1a1d28'; (e.currentTarget as HTMLElement).style.color = '#4b5563'; }}
+            className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:bg-accent"
+            style={{ color: '#4b5563' }}
           >
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-              <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-            </svg>
+            <Cross2Icon width={12} height={12} />
           </button>
         </div>
 
-        {/* ── Scrollable body ── */}
+        {/* Scrollable body */}
         <div className="overflow-y-auto flex-1" style={{ overscrollBehavior: 'contain' }}>
 
           {/* Date + badges */}
-          <div className="px-5 pt-4 pb-3" style={{ borderBottom: '1px solid #1c1f2b' }}>
-            <p className="text-[13px] font-semibold mb-3" style={{ color: '#9ca3af' }}>
+          <div className="px-6 pt-5 pb-4" style={{ borderBottom: '1px solid #1c1f2b' }}>
+            <p className="text-[13px] font-semibold mb-3.5 capitalize" style={{ color: '#9ca3af' }}>
               {formatFullDate(event.date)}
               {event.endDate && <span style={{ color: '#374151' }}> — {formatShort(event.endDate)}</span>}
             </p>
 
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               <span
-                className="inline-flex items-center gap-1 text-[11px] font-bold tracking-wide uppercase px-2 py-1 rounded-md"
+                className="inline-flex items-center gap-1 text-[11px] font-bold tracking-wide uppercase px-2.5 py-1 rounded-md"
                 style={{ color: PRIORITY_COLOR[event.priority], background: `${PRIORITY_COLOR[event.priority]}15`, border: `1px solid ${PRIORITY_COLOR[event.priority]}30` }}
               >
                 {PRIORITY_LABEL[event.priority]}
               </span>
 
               {event.isMajor && (
-                <span className="inline-flex items-center text-[11px] font-bold px-2 py-1 rounded-md" style={{ color: '#fbbf24', background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.22)' }}>
+                <span className="inline-flex items-center text-[11px] font-bold px-2.5 py-1 rounded-md" style={{ color: '#fbbf24', background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.22)' }}>
                   ★ Top 10
                 </span>
               )}
 
               {isUpdated && (
-                <span className="inline-flex items-center text-[11px] font-bold px-2 py-1 rounded-md" style={{ color: '#f97316', background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.28)' }}>
+                <span className="inline-flex items-center text-[11px] font-bold px-2.5 py-1 rounded-md" style={{ color: '#f97316', background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.28)' }}>
                   Aggiornato
                 </span>
               )}
 
               <span
-                className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-md"
+                className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-md"
                 style={{ color: CONFIDENCE_COLOR[event.confidence], background: `${CONFIDENCE_COLOR[event.confidence]}12`, border: `1px solid ${CONFIDENCE_COLOR[event.confidence]}28` }}
               >
                 <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: CONFIDENCE_COLOR[event.confidence] }} />
@@ -295,73 +277,76 @@ export default function EventModal({ event, isUpdated, onClose, onEdit, onDelete
 
           {/* Description */}
           {event.description && (
-            <div className="px-5 py-3.5" style={{ borderBottom: '1px solid #1c1f2b' }}>
-              <p className="text-[13px] leading-relaxed" style={{ color: '#6b7280', lineHeight: 1.65 }}>
+            <div className="px-6 py-4" style={{ borderBottom: '1px solid #1c1f2b' }}>
+              <p className="text-[13px] leading-relaxed" style={{ color: '#6b7280', lineHeight: 1.7 }}>
                 {event.description}
               </p>
             </div>
           )}
 
           {/* Content idea */}
-          <div className="px-5 pt-4 pb-3.5" style={{ borderBottom: '1px solid #1c1f2b' }}>
-            <p className="text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: '#374151' }}>
+          <div className="px-6 pt-5 pb-4" style={{ borderBottom: '1px solid #1c1f2b' }}>
+            <p className="text-[10px] font-bold tracking-widest uppercase mb-3 font-heading" style={{ color: '#374151' }}>
               Idea contenuto
             </p>
-            <p className="text-[13px] leading-relaxed" style={{ color: '#9ca3af', lineHeight: 1.65 }}>
+            <p className="text-[13px] leading-relaxed" style={{ color: '#9ca3af', lineHeight: 1.7 }}>
               {idea}
             </p>
           </div>
 
           {/* Carousel structure */}
-          <div className="px-5 pt-4 pb-4" style={{ borderBottom: event.sourceUrl ? '1px solid #1c1f2b' : 'none' }}>
-            <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: '#374151' }}>
+          <div
+            className="px-6 pt-5 pb-5"
+            style={{ borderBottom: (isUserEvent || event.sourceUrl) ? '1px solid #1c1f2b' : 'none' }}
+          >
+            <p className="text-[10px] font-bold tracking-widest uppercase mb-3.5 font-heading" style={{ color: '#374151' }}>
               Struttura carosello
             </p>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               {slides.map((s) => (
                 <div
                   key={s.n}
-                  className="flex items-start gap-3 rounded-lg px-3 py-2.5"
+                  className="flex items-start gap-3 rounded-lg px-4 py-3"
                   style={{ background: '#0d0f16', border: '1px solid #1a1d28' }}
                 >
                   <span
                     className="flex-shrink-0 w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold mt-0.5"
-                    style={{ background: accentBg, border: `1px solid ${accentBorder}`, color: accentColor, fontFamily: 'var(--font-mono)' }}
+                    style={{ background: accentBg, border: `1px solid ${accentBorder}`, color: accentColor }}
                   >
                     {s.n}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <span className="text-[11px] font-bold" style={{ color: '#c9d1d9' }}>{s.label}</span>
-                    <span className="text-[11px]" style={{ color: '#4b5563' }}> — </span>
-                    <span className="text-[11px]" style={{ color: '#6b7280' }}>{s.copy}</span>
+                    <span className="text-[12px] font-semibold" style={{ color: '#c9d1d9' }}>{s.label}</span>
+                    <span className="text-[12px]" style={{ color: '#374151' }}> — </span>
+                    <span className="text-[12px]" style={{ color: '#6b7280' }}>{s.copy}</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Edit / Delete — user events only */}
+          {/* Edit / Delete — user events */}
           {isUserEvent && (
-            <div className="px-5 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid #1c1f2b' }}>
+            <div className="px-6 py-4 flex items-center gap-2.5" style={{ borderBottom: event.sourceUrl ? '1px solid #1c1f2b' : 'none' }}>
               <button
                 onClick={onEdit}
-                className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-[13px] font-semibold transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[13px] font-semibold transition-colors"
                 style={{ background: '#1a1d28', color: '#c9d1d9', border: '1px solid #252836' }}
                 onMouseEnter={e => (e.currentTarget.style.background = '#252836')}
                 onMouseLeave={e => (e.currentTarget.style.background = '#1a1d28')}
               >
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2-7 7H2.5v-2l7-7z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/></svg>
+                <Pencil1Icon width={13} height={13} />
                 Modifica
               </button>
               <button
                 onClick={() => { if (confirm('Eliminare questo evento?')) { onDelete?.(); onClose(); } }}
-                className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-[13px] font-semibold transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[13px] font-semibold transition-colors"
                 style={{ background: 'rgba(239,68,68,0.08)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.15)')}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.14)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.08)')}
               >
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 3.5h10M5.5 3.5V2h3v1.5M5 3.5v8h4v-8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <TrashIcon width={13} height={13} />
                 Elimina
               </button>
             </div>
@@ -369,22 +354,26 @@ export default function EventModal({ event, isUpdated, onClose, onEdit, onDelete
 
           {/* Source link */}
           {event.sourceUrl && (
-            <div className="px-5 py-3.5">
+            <div className="px-6 py-4">
               <a
                 href={event.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2.5"
+                className="group inline-flex items-center gap-3"
                 style={{ textDecoration: 'none' }}
               >
-                <span className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(96,165,250,0.1)', color: '#60a5fa' }}>
-                  <LinkIcon />
+                <span
+                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(96,165,250,0.1)', color: '#60a5fa', border: '1px solid rgba(96,165,250,0.2)' }}
+                >
+                  <Link2Icon width={14} height={14} />
                 </span>
                 <span>
-                  <span className="text-[13px] font-medium flex items-center gap-1 group-hover:underline" style={{ color: '#60a5fa' }}>
-                    Fonte ufficiale <ExtIcon />
+                  <span className="text-[13px] font-medium flex items-center gap-1.5 group-hover:underline" style={{ color: '#60a5fa' }}>
+                    Fonte ufficiale
+                    <ExternalLinkIcon width={11} height={11} />
                   </span>
-                  <span className="text-[11px] block" style={{ color: '#374151' }}>{domain}</span>
+                  <span className="text-[11px] block mt-0.5" style={{ color: '#374151' }}>{domain}</span>
                 </span>
               </a>
             </div>
